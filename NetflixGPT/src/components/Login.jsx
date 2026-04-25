@@ -1,8 +1,13 @@
 import { checkValidate } from "../utils/validate";
 import Header from "./Header";
 import { useState, useRef } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -10,6 +15,7 @@ const Login = () => {
   const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleSignIn = () => {
     setIsSignIn(!isSignIn);
@@ -33,7 +39,19 @@ const Login = () => {
       )
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
+          updateProfile(user, {
+            displayName: nameRef.current.value,
+            photoURL:
+              "https://occ-0-2484-3662.1.nflxso.net/dnm/api/v6/SO2HoVCx33X8phZh2pZZmQ4QgNY/AAAABSzy9530jJFbbKWQfAUZRqF4M4T6NyPo6YRGIlEKTYGTIOzvZLRo6omzgQQ1XSZ2t-TfR6qPWfVVG96BN2fCTPUHRUGyQXw5if7C.png?r=723",
+          })
+            .then(() => {
+              navigate("/browse");
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              console.log(errorCode, errorMessage);
+            });
         })
         .catch((error) => {
           const errorCode = error.code;

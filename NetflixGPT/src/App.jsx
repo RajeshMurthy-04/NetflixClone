@@ -9,17 +9,26 @@ import { addUser, removeUser } from "./utils/userSlice";
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid, email, displayName } = user;
-        dispatch(addUser({ uid, email, displayName }));
-        navigate("/browse");
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            displayName: displayName || "Guest",
+          }),
+        );
+        navigate("/browse", { replace: true });
       } else {
         dispatch(removeUser());
-        navigate("/login");
+        navigate("/", { replace: true });
       }
     });
+
+    return () => unsubscribe();
   }, []);
 
   return (
